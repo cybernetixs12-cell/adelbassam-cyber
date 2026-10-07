@@ -1,0 +1,197 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  color: #1f2937;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+}
+
+header {
+  background: #1f2937;
+  color: white;
+  padding: 32px 0;
+  margin-bottom: 32px;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+
+header p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+.customer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 21px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+button {
+  border: none;
+  border-radius: 7px;
+  padding: 11px 16px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.result {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 7px;
+  background: #f3f4f6;
+  min-height: 20px;
+}
+
+.staff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.staff-header h2 {
+  margin: 0;
+}
+
+#waitlist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.waitlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.party-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ticket {
+  font-weight: 700;
+}
+
+.party-details {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.remove-button {
+  background: #dc2626;
+  flex-shrink: 0;
+}
+
+.remove-button:hover {
+  background: #b91c1c;
+}
+
+.empty-message {
+  color: #6b7280;
+  text-align: center;
+  padding: 24px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+.staff-link {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.staff-link a {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.staff-link a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .customer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .waitlist-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .remove-button {
+    width: 100%;
+  }
+}

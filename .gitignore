@@ -1,0 +1,5 @@
+node_modules/
+dist/
+waitlist.db
+waitlist.db-shm
+waitlist.db-wal
