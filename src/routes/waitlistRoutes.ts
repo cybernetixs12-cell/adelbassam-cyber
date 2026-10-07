@@ -8,7 +8,31 @@ import {
 
 const router = Router();
 
-router.get("/", (_req, res) => {
+function requireStaff(
+  req: {
+    session: {
+      authenticated?: boolean;
+    };
+  },
+  res: {
+    status: (code: number) => {
+      json: (body: unknown) => unknown;
+    };
+  },
+  next: () => void
+) {
+  if (req.session.authenticated !== true) {
+    res.status(401).json({
+      error: "Staff authentication required"
+    });
+
+    return;
+  }
+
+  next();
+}
+
+router.get("/", requireStaff, (_req, res) => {
   const waitlist = getWaitlist();
 
   res.json(waitlist);
@@ -37,7 +61,7 @@ router.get("/:ticketNumber/ahead", (req, res) => {
   });
 });
 
-router.delete("/:ticketNumber", (req, res) => {
+router.delete("/:ticketNumber", requireStaff, (req, res) => {
   const ticketNumber = Number(req.params.ticketNumber);
 
   if (!Number.isInteger(ticketNumber) || ticketNumber <= 0) {

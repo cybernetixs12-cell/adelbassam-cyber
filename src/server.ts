@@ -1,12 +1,29 @@
 import express from "express";
+import session from "express-session";
 import db from "./db/database.ts";
 import waitlistRoutes from "./routes/waitlistRoutes.ts";
+import authRoutes from "./routes/authRoutes.ts";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+app.use(
+  session({
+    secret: "restaurant-waitlist-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax"
+    }
+  })
+);
+
 app.use(express.static("src/public"));
+
+app.use("/api/auth", authRoutes);
 
 app.use("/api/waitlist", waitlistRoutes);
 

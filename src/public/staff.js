@@ -1,85 +1,225 @@
 const refreshWaitlistButton =
   document.getElementById("refreshWaitlist");
 
+const logoutButton =
+  document.getElementById("logoutButton");
+
 const waitlistElement =
   document.getElementById("waitlist");
+
+let refreshTimer = null;
 
 refreshWaitlistButton.addEventListener(
   "click",
   loadWaitlist
 );
 
-async function loadWaitlist() {
-  const response = await fetch("/api/waitlist");
-  const waitlist = await response.json();
+logoutButton.addEventListener(
+  "click",
+  logout
+);
 
-  waitlistElement.innerHTML = "";
+async function checkAuthentication() {
+  try {
+    const response = await fetch("/api/auth/me");
 
-  if (waitlist.length === 0) {
-    const emptyMessage = document.createElement("li");
+    if (!response.ok) {
+      window.location.href = "/staff-login.html";
+      return false;
+    }
 
-    emptyMessage.className = "empty-message";
-    emptyMessage.textContent = "No parties are currently waiting.";
+    const data = await response.json();
 
-    waitlistElement.appendChild(emptyMessage);
+    if (!data.authenticated) {
+      window.location.href = "/staff-login.html";
+      return false;
+    }
 
-    return;
+    return true;
+  } catch (error) {
+    console.error(
+      "Could not check authentication:",
+      error
+    );
+
+    window.location.href = "/staff-login.html";
+    return false;
   }
+}
 
-  for (const party of waitlist) {
-    const listItem = document.createElement("li");
+async function loadWaitlist() {
+  try {
+    const response = await fetch("/api/waitlist");
 
-    listItem.className = "waitlist-item";
+    if (!response.ok) {
+      throw new Error("Could not load waitlist");
+    }
 
-    const partyInfo = document.createElement("div");
+    const waitlist = await response.json();
 
-    partyInfo.className = "party-info";
+    waitlistElement.innerHTML = "";
 
-    const ticket = document.createElement("div");
+    if (waitlist.length === 0) {
+      const emptyMessage = document.createElement("li");
 
-    ticket.className = "ticket";
-    ticket.textContent = `Ticket ${party.ticket_number}`;
+      emptyMessage.className = "empty-message";
+      emptyMessage.textContent =
+        "No parties are currently waiting.";
 
-    const partyDetails = document.createElement("div");
+      waitlistElement.appendChild(emptyMessage);
 
-    partyDetails.className = "party-details";
-    partyDetails.textContent =
-      `${party.name} (${party.party_size} people)`;
+      return;
+    }
 
-    partyInfo.appendChild(ticket);
-    partyInfo.appendChild(partyDetails);
+    for (const party of waitlist) {
+      const listItem = document.createElement("li");
 
-    const removeButton = document.createElement("button");
+      listItem.className = "waitlist-item";
 
-    removeButton.className = "remove-button";
-    removeButton.textContent = "Remove";
+      const partyInfo = document.createElement("div");
 
-    removeButton.addEventListener("click", async () => {
-      await removeParty(party.ticket_number);
-    });
+      partyInfo.className = "party-info";
 
-    listItem.appendChild(partyInfo);
-    listItem.appendChild(removeButton);
+      const ticket = document.createElement("div");
 
-    waitlistElement.appendChild(listItem);
+      ticket.className = "ticket";
+      ticket.textContent =
+        `Ticket ${party.ticket_number}`;
+
+      const partyDetails = document.createElement("div");
+
+      partyDetails.className = "party-details";
+      partyDetails.textContent =
+        `${party.name} (${party.party_size} people)`;
+
+      partyInfo.appendChild(ticket);
+      partyInfo.appendChild(partyDetails);
+
+      const removeButton = document.createElement("button");
+
+      removeButton.className = "remove-button";
+      removeButton.textContent = "Remove";
+
+      removeButton.addEventListener("click", async () => {
+        const confirmed = window.confirm(
+          `Are you sure you want to remove Ticket ${party.ticket_number}?`
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        await removeParty(party.ticket_number);
+      });
+
+      listItem.appendChild(partyInfo);
+      listItem.appendChild(removeButton);
+
+      waitlistElement.appendChild(listItem);
+    }
+  } catch (error) {
+    console.error("Could not load waitlist:", error);
+
+    waitlistElement.innerHTML = "";
+
+    const errorMessage = document.createElement("li");
+
+    errorMessage.className = "empty-message";
+    errorMessage.textContent =
+      "Unable to load the waitlist. Please try again.";
+
+    waitlistElement.appendChild(errorMessage);
   }
 }
 
 async function removeParty(ticketNumber) {
-  const response = await fetch(
-    `/api/waitlist/${ticketNumber}`,
-    {
-      method: "DELETE"
-    }
-  );
+  try {
+    const response = await fetch(
+      `/api/waitlist/${ticketNumber}`,
+      {
+        method: "DELETE"
+      }
+    );
 
-  if (!response.ok) {
-    const data = await response.json();
-    alert(data.error);
+    if (!response.ok) {
+      let message = "Unable to remove the party.";
+
+      try {
+        const data = await response.json();
+        message = data.error || message;
+      } catch {
+        // Keep the default error message.
+      }
+
+      alert(message);
+      return;
+    }
+
+    await loadWaitlist();
+  } catch (error) {
+    console.error(
+      "Could not remove party:",
+      error
+    );
+
+    alert(
+      "Unable to remove the party. Please try again."
+    );
+  }
+}
+
+async function logout() {
+  try {
+    const response = await fetch(
+      "/api/auth/logout",
+      {
+        method: "POST"
+      }
+    );
+
+    if (!response.ok) {
+      alert("Could not log out. Please try again.");
+      return;
+    }
+
+    stopAutomaticRefresh();
+
+    window.location.href = "/staff-login.html";
+  } catch (error) {
+    console.error("Logout error:", error);
+
+    alert(
+      "Could not log out. Please try again."
+    );
+  }
+}
+
+function startAutomaticRefresh() {
+  stopAutomaticRefresh();
+
+  refreshTimer = setInterval(
+    loadWaitlist,
+    5000
+  );
+}
+
+function stopAutomaticRefresh() {
+  if (refreshTimer !== null) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+
+async function initializeStaffPage() {
+  const authenticated =
+    await checkAuthentication();
+
+  if (!authenticated) {
     return;
   }
 
   await loadWaitlist();
+  startAutomaticRefresh();
 }
 
-loadWaitlist();
+initializeStaffPage();

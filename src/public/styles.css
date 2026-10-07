@@ -9,6 +9,49 @@ body {
   color: #1f2937;
 }
 
+/* Navigation bar */
+
+.navbar {
+  background: #111827;
+  color: white;
+}
+
+.nav-container {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  min-height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-brand {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+/* Header */
+
 .container {
   width: min(1100px, 92%);
   margin: 0 auto;
@@ -177,6 +220,22 @@ button:hover {
 }
 
 @media (max-width: 700px) {
+  .nav-container {
+    min-height: 56px;
+  }
+
+  .nav-brand {
+    font-size: 16px;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+  }
+
   .customer-grid {
     grid-template-columns: 1fr;
   }
